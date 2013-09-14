@@ -16,12 +16,13 @@ public class MultiRotaryKnobView extends View {
 	
 	private Paint knobColour = null;
 	private Paint marksColour = null;
-	private float value = 0.0f;
+	private float tock = 0.0f;
+	protected float value = 0.0f;
 
 	private float valueOld1 = 0.0f;
 	
 	private int depth = 3;
-	private int power = 10;
+	private int power = 4;
 
 	private static boolean arcs = true;
 
@@ -112,7 +113,10 @@ public class MultiRotaryKnobView extends View {
 			canvas.restore();
 		}
 		valueOld1 = value;
-		value += Math.pow(power, -depth) * (Math.abs(Math.sin(value*10))+0.01);
+		float minVel = (float) (Math.pow(power, -depth) * 0.01);
+		float maxVel = 0.01f;
+		value += (maxVel - minVel) * (1.0f-Math.abs(Math.sin(tock))) + minVel;
+		tock += 0.01;
 		this.invalidate();
 	}
 

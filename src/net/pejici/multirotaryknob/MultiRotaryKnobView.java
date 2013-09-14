@@ -1,30 +1,36 @@
 package net.pejici.multirotaryknob;
 
 import android.content.Context;
+import android.drm.DrmStore.Action;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.Path.FillType;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class MultiRotaryKnobView extends View {
 	
 	private Paint knobColour = null;
 	private Paint marksColour = null;
-	private float tock = 0.0f;
 	protected float value = 0.0f;
 
 	private float valueOld1 = 0.0f;
 	
-	private int depth = 3;
-	private int power = 4;
+	private int depth = 4;
+	private int power = 2;
 
 	private static boolean arcs = true;
+
+	private int selectionDepth = -1;
+	private float selectionStartAngle = 0.0f;
+	private float selectionStartValue = 0.0f;
 
 	public MultiRotaryKnobView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -70,7 +76,7 @@ public class MultiRotaryKnobView extends View {
 			}
 			canvas.drawCircle(0, my, R, p);
 			Path arc = null;
-			float radVelocity = (float) (velocity * Math.pow(power, d));
+			float radVelocity = (float) (Math.abs(velocity) * Math.pow(power, d));
 			radVelocity = Math.min(10f/360f*2f*(float)Math.PI, radVelocity);
 			radVelocity = Math.max(0.6f/Rsub, radVelocity); // minimum size
 			radVelocity = radVelocity/2;
@@ -112,12 +118,36 @@ public class MultiRotaryKnobView extends View {
 			}
 			canvas.restore();
 		}
-		valueOld1 = value;
-		float minVel = (float) (Math.pow(power, -depth) * 0.01);
-		float maxVel = 0.01f;
-		value += (maxVel - minVel) * (1.0f-Math.abs(Math.sin(tock))) + minVel;
-		tock += 0.01;
-		this.invalidate();
+		if (value != valueOld1) {
+			valueOld1 = value;
+			this.invalidate();
+		}
+	}
+	
+	float angleFrom(MotionEvent event) {
+		return (float) (Math.atan2(event.getY()-this.getHeight()/2, event.getX()));
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// TODO Auto-generated method stub
+		int action = event.getAction();
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:
+			selectionDepth = 0;
+			selectionStartValue = value;
+			selectionStartAngle = angleFrom(event);
+			break;
+		case MotionEvent.ACTION_MOVE:
+		case MotionEvent.ACTION_UP:
+			float angle = angleFrom(event);
+			float aDiff = angle - selectionStartAngle;
+			// TODO: adjust for selection Depth
+			value = selectionStartValue + aDiff;
+			this.invalidate();
+			break;
+		}
+		return true;
 	}
 
 }

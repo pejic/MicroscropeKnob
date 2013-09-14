@@ -1,10 +1,11 @@
-package net.pejici.multirotaryknob;
+package net.pejici.microscopeknob;
 
+import net.pejici.multirotaryknob.R;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
-public class MultiRotaryKnobDemo extends Activity {
+public class MicroscopeKnobDemo extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

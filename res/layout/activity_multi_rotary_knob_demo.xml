@@ -8,9 +8,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MultiRotaryKnobDemo" >
+    tools:context=".MicroscopeKnobDemo" >
 
-    <net.pejici.multirotaryknob.MultiRotaryKnobView
+    <net.pejici.microscopeknob.MicroscopeKnobView
         android:id="@+id/MultiRotaryKnobView1"
         android:layout_column="0"
         android:layout_gravity="left|top"

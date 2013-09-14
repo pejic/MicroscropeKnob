@@ -1,4 +1,4 @@
-package net.pejici.multirotaryknob;
+package net.pejici.microscopeknob;
 
 import android.content.Context;
 import android.drm.DrmStore.Action;
@@ -16,7 +16,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class MultiRotaryKnobView extends View {
+public class MicroscopeKnobView extends View {
 	
 	private Paint knobColour = null;
 	private Paint marksColour = null;
@@ -34,7 +34,7 @@ public class MultiRotaryKnobView extends View {
 	private float selectionStartAngle = 0.0f;
 	private float selectionStartValue = 0.0f;
 
-	public MultiRotaryKnobView(Context context, AttributeSet attrs) {
+	public MicroscopeKnobView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 		init();

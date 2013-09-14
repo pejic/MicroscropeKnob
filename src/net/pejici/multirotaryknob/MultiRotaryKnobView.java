@@ -48,14 +48,14 @@ public class MultiRotaryKnobView extends View {
 	private void init() {
 		// TODO Auto-generated method stub
 		knobColour = new Paint(Paint.ANTI_ALIAS_FLAG);
-		knobColour.setARGB(255, 220, 180, 40);
+		knobColour.setARGB(255, 255, 120, 40);
 		marksColour = new Paint(Paint.ANTI_ALIAS_FLAG);
 		marksColour.setStyle(Style.FILL);
 		marksColour.setStrokeWidth(1.f);
 		marksColour.setStrokeJoin(Join.BEVEL);
 		marksColour.setARGB(255, 50, 25, 16);
 		textColour = new Paint(marksColour);
-		textColour.setTextSize(pxFromDip(12));
+		textColour.setTextSize(pxFromDip(24));
 	}
 
 	private float getBaseRadius() {
@@ -78,9 +78,9 @@ public class MultiRotaryKnobView extends View {
 		for (d = depth; d > 0; d--) {
 			Paint p = new Paint(knobColour);
 			int colour = p.getColor();
-			int red = (colour & 0x00FF0000) >> 16;
-			red -= d * 20;
-			colour = (colour & 0xFF00FFFF) | ((red << 16) & 0x00FF0000);
+			int green = (colour & 0x0000FF00) >> 8;
+			green += d * 10;
+			colour = (colour & 0xFFFF00FF) | ((green << 8) & 0x0000FF00);
 			p.setColor(colour);
 			float R = r*d;
 			float Rsub = r*d-r;
@@ -92,9 +92,9 @@ public class MultiRotaryKnobView extends View {
 			float radVelocity = (float) (Math.abs(velocity) * Math.pow(power, d));
 			radVelocity = radVelocity/16;
 			radVelocity = Math.min(10f/360f*2f*(float)Math.PI, radVelocity);
-			radVelocity = Math.max(0.6f/Rsub, radVelocity); // minimum size
+			radVelocity = Math.max(1.0f/Rsub, radVelocity); // minimum size
 			radVelocity = radVelocity/2;
-			float alpha = (float) ((0.1f/360.f * 2 * Math.PI / radVelocity));
+			float alpha = (float) ((0.7f/Rsub / radVelocity));
 			alpha = Math.min(1.0f, alpha);
 			if (arcs) {
 				arc = new Path();

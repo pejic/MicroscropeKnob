@@ -19,10 +19,9 @@ public class MultiRotaryKnobView extends View {
 	private float value = 0.0f;
 
 	private float valueOld1 = 0.0f;
-	private float valueOld2 = 0.0f;
 	
 	private int depth = 3;
-	private int power = 4;
+	private int power = 10;
 
 	private static boolean arcs = true;
 
@@ -55,7 +54,7 @@ public class MultiRotaryKnobView extends View {
 		float rHmin = h/2;
 		float r = Math.min(rWmin, rHmin);
 		int d = 0;
-		float velocity = (value - valueOld2) / 2;
+		float velocity = (value - valueOld1);
 		for (d = depth; d > 0; d--) {
 			Paint p = new Paint(knobColour);
 			int colour = p.getColor();
@@ -72,6 +71,7 @@ public class MultiRotaryKnobView extends View {
 			Path arc = null;
 			float radVelocity = (float) (velocity * Math.pow(power, d));
 			radVelocity = Math.min(10f/360f*2f*(float)Math.PI, radVelocity);
+			radVelocity = Math.max(0.6f/Rsub, radVelocity); // minimum size
 			radVelocity = radVelocity/2;
 			float alpha = (float) ((0.4f/360.f * 2 * Math.PI / radVelocity));
 			alpha = Math.min(1.0f, alpha);
@@ -111,9 +111,8 @@ public class MultiRotaryKnobView extends View {
 			}
 			canvas.restore();
 		}
-		valueOld2 = valueOld1;
 		valueOld1 = value;
-		value += Math.pow(power, -depth) * (Math.abs(Math.sin(value*10))+0.001);
+		value += Math.pow(power, -depth) * (Math.abs(Math.sin(value*10))+0.01);
 		this.invalidate();
 	}
 

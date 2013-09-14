@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.graphics.Path.FillType;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -19,12 +20,13 @@ public class MultiRotaryKnobView extends View {
 	
 	private Paint knobColour = null;
 	private Paint marksColour = null;
+	private Paint textColour = null;
 	protected float value = 0.0f;
 
 	private float valueOld1 = 0.0f;
 	
 	private int depth = 4;
-	private int power = 2;
+	private int power = 10;
 
 	private static boolean arcs = true;
 
@@ -38,6 +40,11 @@ public class MultiRotaryKnobView extends View {
 		init();
 	}
 	
+	private float pxFromDip(float dip) {
+		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				dip, getResources().getDisplayMetrics());
+	}
+
 	private void init() {
 		// TODO Auto-generated method stub
 		knobColour = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -47,19 +54,25 @@ public class MultiRotaryKnobView extends View {
 		marksColour.setStrokeWidth(1.f);
 		marksColour.setStrokeJoin(Join.BEVEL);
 		marksColour.setARGB(255, 50, 25, 16);
+		textColour = new Paint(marksColour);
+		textColour.setTextSize(pxFromDip(12));
 	}
-	
+
+	private float getBaseRadius() {
+		float w = this.getWidth();
+		float h = this.getHeight();
+		float rWmin = w/depth;
+		float rHmin = h/2;
+		return (Math.min(rWmin, rHmin));
+	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
-		float w = this.getWidth();
-		float h = this.getHeight();
-		float mx = w/2;
-		float my = h/2;
-		float rWmin = w/depth;
-		float rHmin = h/2;
-		float r = Math.min(rWmin, rHmin);
+		float mx = this.getWidth()/2;
+		float my = this.getHeight()/2;
+		float r = getBaseRadius();
 		int d = 0;
 		float velocity = (value - valueOld1);
 		for (d = depth; d > 0; d--) {
@@ -77,10 +90,11 @@ public class MultiRotaryKnobView extends View {
 			canvas.drawCircle(0, my, R, p);
 			Path arc = null;
 			float radVelocity = (float) (Math.abs(velocity) * Math.pow(power, d));
+			radVelocity = radVelocity/16;
 			radVelocity = Math.min(10f/360f*2f*(float)Math.PI, radVelocity);
 			radVelocity = Math.max(0.6f/Rsub, radVelocity); // minimum size
 			radVelocity = radVelocity/2;
-			float alpha = (float) ((0.4f/360.f * 2 * Math.PI / radVelocity));
+			float alpha = (float) ((0.1f/360.f * 2 * Math.PI / radVelocity));
 			alpha = Math.min(1.0f, alpha);
 			if (arcs) {
 				arc = new Path();
@@ -118,14 +132,28 @@ public class MultiRotaryKnobView extends View {
 			}
 			canvas.restore();
 		}
+		canvas.drawText("Value :" + value, 0, this.getHeight(), textColour);
 		if (value != valueOld1) {
 			valueOld1 = value;
 			this.invalidate();
 		}
 	}
 	
-	float angleFrom(MotionEvent event) {
+	private float angleFrom(MotionEvent event) {
 		return (float) (Math.atan2(event.getY()-this.getHeight()/2, event.getX()));
+	}
+
+	private int depthFrom(MotionEvent event) {
+		float dx = event.getX() - 0;
+		float dy = event.getY() - this.getHeight()/2;
+		float dist = (float) (Math.sqrt(dx*dx + dy*dy));
+		float baseRadius = this.getBaseRadius();
+		int selection = (int) Math.floor(dist/baseRadius);
+		selection = selection + 1;
+		if (selection >= depth) {
+			selection = depth;
+		}
+		return selection;
 	}
 
 	@Override
@@ -134,7 +162,7 @@ public class MultiRotaryKnobView extends View {
 		int action = event.getAction();
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
-			selectionDepth = 0;
+			selectionDepth = depthFrom(event);
 			selectionStartValue = value;
 			selectionStartAngle = angleFrom(event);
 			break;
@@ -142,7 +170,7 @@ public class MultiRotaryKnobView extends View {
 		case MotionEvent.ACTION_UP:
 			float angle = angleFrom(event);
 			float aDiff = angle - selectionStartAngle;
-			// TODO: adjust for selection Depth
+			aDiff = aDiff / (float)Math.pow(power, selectionDepth);
 			value = selectionStartValue + aDiff;
 			this.invalidate();
 			break;
